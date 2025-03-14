@@ -1,0 +1,20 @@
+MainPrgm L3_software ;
+Var
+< !- Partie déclaration - !>
+let x,y,z : Int;
+let A,B : [Int ; 10] ;
+@define Const Software : Int = 9.1;
+BeginPg
+{
+{-- Partie Instruction --}
+}
+EndPg ;
+
+
+
+
+
+
+
+
+
