@@ -1,10 +1,12 @@
 %{
+   #include "TS.h" 
    #include "syntax.tab.h"
    #include <stdio.h> 
    #include <stdlib.h>
    #include <string.h>
    extern int lineNumber;
    extern int columnNumber;
+   extern YYSTYPE yylval;
 %}
 
 Identifier [a-zA-Z]([a-zA-Z0-9]*_?[a-zA-Z0-9])*
@@ -44,6 +46,8 @@ signedFloat [+-][0-9]+\.[0-9]+
               if (yytext[strlen(yytext) - 1] == '_') { printf("Found a lexical error at the line %d and the column %d : identifier can't end with _",lineNumber,columnNumber); return 0;}
               if (strstr(yytext,"__")) {printf("Found a lexical error at the line %d and the column %d : identifier can't have consecutive _",lineNumber,columnNumber); return 0;}
               printf("%s",yytext);
+              yylval.str=strdup(yytext);
+              inserer(yytext,"idf");
               return identifier;
               }
 
@@ -72,10 +76,11 @@ signedFloat [+-][0-9]+\.[0-9]+
            int numValue = atoi(yytext);
            if(numValue > 32767){printf("Found a lexical error at the line %d and the column %d : integer value can't be above 32767\n",lineNumber,columnNumber); return 0;}
            printf("%s",yytext); 
+           yylval.entier=atoi(yytext);
            return t_int;
            }
 {signedFloat} {printf("%s ",yytext); columnNumber+=yyleng;}
-{float} {printf("%s ",yytext); columnNumber+=yyleng; return t_float;}
+{float} {printf("%s ",yytext); yylval.floatval=atof(yytext); columnNumber+=yyleng; return t_float;}
 \, {printf(","); columnNumber+=1; return vg;}
 \; {printf(";\n"); columnNumber+=1; return pvg;}
 \= {printf(" = "); columnNumber+=1; return egual;}
@@ -100,8 +105,3 @@ signedFloat [+-][0-9]+\.[0-9]+
 . {printf("Found a lexical error at the line %d and the column %d \n",lineNumber,columnNumber); columnNumber+=yyleng;}
 %%
 
-/* int main(){
-
-    yylex();
-    return 0;
-} */

@@ -1,0 +1,438 @@
+Grammar
+
+    0 $accept: program $end
+
+    1 program: MainPrgm identifier pvg Var singleLineComment declaration_part BeginPg ocb multiLineComment ccb EndPg pvg
+
+    2 declaration_part: declaration_list
+
+    3 declaration_list: declaration_list declaration
+    4                 | declaration
+
+    5 declaration: variable_declaration
+    6            | constant_declaration
+
+    7 variable_declaration: let var_list tp type pvg
+    8                     | let var_list tp ob type pvg t_int cb pvg
+
+    9 var_list: identifier
+   10         | var_list vg identifier
+
+   11 type: Int
+   12     | Float
+
+   13 constant_declaration: define Const identifier tp type egual nature pvg
+
+   14 nature: t_int
+   15       | t_float
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+MainPrgm (258) 1
+pvg (259) 1 7 8 13
+Var (260) 1
+singleLineComment (261) 1
+let (262) 7 8
+define (263) 13
+Const (264) 13
+t_int (265) 8 14
+t_float (266) 15
+BeginPg (267) 1
+ocb (268) 1
+multiLineComment (269) 1
+ccb (270) 1
+EndPg (271) 1
+egual (272) 13
+tp (273) 7 8 13
+vg (274) 10
+ob (275) 8
+cb (276) 8
+identifier (277) 1 9 10 13
+Int (278) 11
+Float (279) 12
+
+
+Nonterminals, with rules where they appear
+
+$accept (25)
+    on left: 0
+program (26)
+    on left: 1, on right: 0
+declaration_part (27)
+    on left: 2, on right: 1
+declaration_list (28)
+    on left: 3 4, on right: 2 3
+declaration (29)
+    on left: 5 6, on right: 3 4
+variable_declaration (30)
+    on left: 7 8, on right: 5
+var_list (31)
+    on left: 9 10, on right: 7 8 10
+type (32)
+    on left: 11 12, on right: 7 8 13
+constant_declaration (33)
+    on left: 13, on right: 6
+nature (34)
+    on left: 14 15, on right: 13
+
+
+state 0
+
+    0 $accept: . program $end
+
+    MainPrgm  shift, and go to state 1
+
+    program  go to state 2
+
+
+state 1
+
+    1 program: MainPrgm . identifier pvg Var singleLineComment declaration_part BeginPg ocb multiLineComment ccb EndPg pvg
+
+    identifier  shift, and go to state 3
+
+
+state 2
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 4
+
+
+state 3
+
+    1 program: MainPrgm identifier . pvg Var singleLineComment declaration_part BeginPg ocb multiLineComment ccb EndPg pvg
+
+    pvg  shift, and go to state 5
+
+
+state 4
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+state 5
+
+    1 program: MainPrgm identifier pvg . Var singleLineComment declaration_part BeginPg ocb multiLineComment ccb EndPg pvg
+
+    Var  shift, and go to state 6
+
+
+state 6
+
+    1 program: MainPrgm identifier pvg Var . singleLineComment declaration_part BeginPg ocb multiLineComment ccb EndPg pvg
+
+    singleLineComment  shift, and go to state 7
+
+
+state 7
+
+    1 program: MainPrgm identifier pvg Var singleLineComment . declaration_part BeginPg ocb multiLineComment ccb EndPg pvg
+
+    let     shift, and go to state 8
+    define  shift, and go to state 9
+
+    declaration_part      go to state 10
+    declaration_list      go to state 11
+    declaration           go to state 12
+    variable_declaration  go to state 13
+    constant_declaration  go to state 14
+
+
+state 8
+
+    7 variable_declaration: let . var_list tp type pvg
+    8                     | let . var_list tp ob type pvg t_int cb pvg
+
+    identifier  shift, and go to state 15
+
+    var_list  go to state 16
+
+
+state 9
+
+   13 constant_declaration: define . Const identifier tp type egual nature pvg
+
+    Const  shift, and go to state 17
+
+
+state 10
+
+    1 program: MainPrgm identifier pvg Var singleLineComment declaration_part . BeginPg ocb multiLineComment ccb EndPg pvg
+
+    BeginPg  shift, and go to state 18
+
+
+state 11
+
+    2 declaration_part: declaration_list .
+    3 declaration_list: declaration_list . declaration
+
+    let     shift, and go to state 8
+    define  shift, and go to state 9
+
+    $default  reduce using rule 2 (declaration_part)
+
+    declaration           go to state 19
+    variable_declaration  go to state 13
+    constant_declaration  go to state 14
+
+
+state 12
+
+    4 declaration_list: declaration .
+
+    $default  reduce using rule 4 (declaration_list)
+
+
+state 13
+
+    5 declaration: variable_declaration .
+
+    $default  reduce using rule 5 (declaration)
+
+
+state 14
+
+    6 declaration: constant_declaration .
+
+    $default  reduce using rule 6 (declaration)
+
+
+state 15
+
+    9 var_list: identifier .
+
+    $default  reduce using rule 9 (var_list)
+
+
+state 16
+
+    7 variable_declaration: let var_list . tp type pvg
+    8                     | let var_list . tp ob type pvg t_int cb pvg
+   10 var_list: var_list . vg identifier
+
+    tp  shift, and go to state 20
+    vg  shift, and go to state 21
+
+
+state 17
+
+   13 constant_declaration: define Const . identifier tp type egual nature pvg
+
+    identifier  shift, and go to state 22
+
+
+state 18
+
+    1 program: MainPrgm identifier pvg Var singleLineComment declaration_part BeginPg . ocb multiLineComment ccb EndPg pvg
+
+    ocb  shift, and go to state 23
+
+
+state 19
+
+    3 declaration_list: declaration_list declaration .
+
+    $default  reduce using rule 3 (declaration_list)
+
+
+state 20
+
+    7 variable_declaration: let var_list tp . type pvg
+    8                     | let var_list tp . ob type pvg t_int cb pvg
+
+    ob     shift, and go to state 24
+    Int    shift, and go to state 25
+    Float  shift, and go to state 26
+
+    type  go to state 27
+
+
+state 21
+
+   10 var_list: var_list vg . identifier
+
+    identifier  shift, and go to state 28
+
+
+state 22
+
+   13 constant_declaration: define Const identifier . tp type egual nature pvg
+
+    tp  shift, and go to state 29
+
+
+state 23
+
+    1 program: MainPrgm identifier pvg Var singleLineComment declaration_part BeginPg ocb . multiLineComment ccb EndPg pvg
+
+    multiLineComment  shift, and go to state 30
+
+
+state 24
+
+    8 variable_declaration: let var_list tp ob . type pvg t_int cb pvg
+
+    Int    shift, and go to state 25
+    Float  shift, and go to state 26
+
+    type  go to state 31
+
+
+state 25
+
+   11 type: Int .
+
+    $default  reduce using rule 11 (type)
+
+
+state 26
+
+   12 type: Float .
+
+    $default  reduce using rule 12 (type)
+
+
+state 27
+
+    7 variable_declaration: let var_list tp type . pvg
+
+    pvg  shift, and go to state 32
+
+
+state 28
+
+   10 var_list: var_list vg identifier .
+
+    $default  reduce using rule 10 (var_list)
+
+
+state 29
+
+   13 constant_declaration: define Const identifier tp . type egual nature pvg
+
+    Int    shift, and go to state 25
+    Float  shift, and go to state 26
+
+    type  go to state 33
+
+
+state 30
+
+    1 program: MainPrgm identifier pvg Var singleLineComment declaration_part BeginPg ocb multiLineComment . ccb EndPg pvg
+
+    ccb  shift, and go to state 34
+
+
+state 31
+
+    8 variable_declaration: let var_list tp ob type . pvg t_int cb pvg
+
+    pvg  shift, and go to state 35
+
+
+state 32
+
+    7 variable_declaration: let var_list tp type pvg .
+
+    $default  reduce using rule 7 (variable_declaration)
+
+
+state 33
+
+   13 constant_declaration: define Const identifier tp type . egual nature pvg
+
+    egual  shift, and go to state 36
+
+
+state 34
+
+    1 program: MainPrgm identifier pvg Var singleLineComment declaration_part BeginPg ocb multiLineComment ccb . EndPg pvg
+
+    EndPg  shift, and go to state 37
+
+
+state 35
+
+    8 variable_declaration: let var_list tp ob type pvg . t_int cb pvg
+
+    t_int  shift, and go to state 38
+
+
+state 36
+
+   13 constant_declaration: define Const identifier tp type egual . nature pvg
+
+    t_int    shift, and go to state 39
+    t_float  shift, and go to state 40
+
+    nature  go to state 41
+
+
+state 37
+
+    1 program: MainPrgm identifier pvg Var singleLineComment declaration_part BeginPg ocb multiLineComment ccb EndPg . pvg
+
+    pvg  shift, and go to state 42
+
+
+state 38
+
+    8 variable_declaration: let var_list tp ob type pvg t_int . cb pvg
+
+    cb  shift, and go to state 43
+
+
+state 39
+
+   14 nature: t_int .
+
+    $default  reduce using rule 14 (nature)
+
+
+state 40
+
+   15 nature: t_float .
+
+    $default  reduce using rule 15 (nature)
+
+
+state 41
+
+   13 constant_declaration: define Const identifier tp type egual nature . pvg
+
+    pvg  shift, and go to state 44
+
+
+state 42
+
+    1 program: MainPrgm identifier pvg Var singleLineComment declaration_part BeginPg ocb multiLineComment ccb EndPg pvg .
+
+    $default  reduce using rule 1 (program)
+
+
+state 43
+
+    8 variable_declaration: let var_list tp ob type pvg t_int cb . pvg
+
+    pvg  shift, and go to state 45
+
+
+state 44
+
+   13 constant_declaration: define Const identifier tp type egual nature pvg .
+
+    $default  reduce using rule 13 (constant_declaration)
+
+
+state 45
+
+    8 variable_declaration: let var_list tp ob type pvg t_int cb pvg .
+
+    $default  reduce using rule 8 (variable_declaration)

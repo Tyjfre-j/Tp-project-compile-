@@ -1,5 +1,6 @@
 
 %{
+    #include "TS.h" 
     #include <stdio.h> 
     #include <stdlib.h>
     #include <string.h>
@@ -8,10 +9,18 @@
     int columnNumber = 1; 
 %}
 
-%token MainPrgm identifier pvg Var singleLineComment let define Const t_int 
-       t_float BeginPg ocb multiLineComment ccb EndPg egual tp vg ob 
-       cb Int Float 
+%union {
+int entier;
+char* str;
+float floatval;
+}
 
+%token MainPrgm pvg Var singleLineComment let define Const t_int 
+       t_float BeginPg ocb multiLineComment ccb EndPg egual tp vg ob 
+       cb 
+%token<str> identifier
+%token<entier> Int 
+%token<floatval> Float 
 %start program
 
 %%
@@ -54,10 +63,10 @@ nature:
     t_int | t_float ;
 %%
 
-int main ()
+main ()
 {
- int result = yyparse();
-    return result; 
+ yyparse();
+ afficher();
 }
 yywrap()
 {}
