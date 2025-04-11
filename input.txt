@@ -1,12 +1,56 @@
 MainPrgm L3_software ;
 Var
-< !- Partie déclaration - !>
-let x,y,z : Int;
 let A,B : [Int ; 10] ;
-@define Const Software : Int = 9.1;
+let x,y,z : Int;
+@define Const Software : Int = 91;
 BeginPg
 {
-{-- Partie Instruction --}
+A := 23 ;
+B [5] := (H+ 2) / (5 - b +(-3)) ;
+
+if (A + 2 > B) then
+{
+H := J - 5.5;
+} else {
+H := H - 1 ;
+}
+
+do {
+x := x + 1;
+} while (x<100);
+
+for i from 1 to 10 step 2 {
+Ka := Hj * i;
+}
+
+input(UserName) ;
+output("Vous avez saisi: ",UserName) ;
+
+a := 10;
+b := 20;
+if (a < b) then {
+    output("a is less than b");
+} else {
+    output("a is greater or equal to b");
+}
+
+for i from 0 to 5 step 1 {
+    a := a + 1;
+}
+
+do {
+    for i from 1 to 5 step 1 {
+        output("Inside for loop, i = ", i);
+    }
+    x := x + 1;
+} while (x < 3);
+
+if ((x > 5) AND (y < 10)) then {
+    output("Condition evaluated to 1");
+} else {
+    output("Condition evaluated to 0");
+}
+
 }
 EndPg ;
 

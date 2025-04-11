@@ -9,68 +9,193 @@
    extern YYSTYPE yylval;
 %}
 
-Identifier [a-zA-Z]([a-zA-Z0-9]*_?[a-zA-Z0-9])*
+Identifier [a-zA-Z]([a-zA-Z0-9]*_?[a-zA-Z0-9])* 
 singleLineComment "< !-"[^\n]*"- !>"
-multiLineComment "{--"(.|\n)*?"--}"
-chaine \"[^\"]*\"
+multiLineComment "\{--"(.|\n)*?"--\}"
+chaine \"[^\"]*\" 
 integer [0-9]+
 signedInteger [+-][0-9]+
 float [0-9]+\.[0-9]+
 signedFloat [+-][0-9]+\.[0-9]+
 
 %%
-"MainPrgm" {printf("MainPrgm "); columnNumber+=yyleng; return MainPrgm;}
-"Var" {printf("Var\n"); columnNumber+=yyleng; return Var;}
-"BeginPg" {printf("BeginPg\n"); columnNumber+=yyleng; return BeginPg;}
-"EndPg" {printf("EndPg"); columnNumber+=yyleng; return EndPg;}
-"let" {printf("let "); columnNumber+=yyleng; return let;}
-"@define" {printf("@define "); columnNumber+=yyleng; return define;}
-"Const" {printf("Const "); columnNumber+=yyleng; return Const;}
-"Int" {printf("Int"); columnNumber+=yyleng; return Int;}
-"Float" {printf("Float"); columnNumber+=yyleng; return Float;}
-"if" {printf("if"); columnNumber+=yyleng;}
-"then" {printf("then"); columnNumber+=yyleng;}
-"else" {printf("else"); columnNumber+=yyleng;}
-"do" {printf("do"); columnNumber+=yyleng;}
-"while" {printf("while"); columnNumber+=yyleng;}
-"for" {printf("for"); columnNumber+=yyleng;}
-"from" {printf("from"); columnNumber+=yyleng;}
-"to" {printf("to"); columnNumber+=yyleng;}
-"step" {printf("step"); columnNumber+=yyleng;}
-"input" {printf("input"); columnNumber+=yyleng;}
-"output" {printf("output"); columnNumber+=yyleng;}
-"AND" {printf("AND"); columnNumber+=yyleng;}
-"OR" {printf("OR"); columnNumber+=yyleng;}
-{Identifier} {columnNumber+=yyleng; 
-              if (yyleng > 14) { printf ("Found a lexical error at the line %d and the column %d : identifier is too long",lineNumber,columnNumber); return 0;}
-              if (yytext[strlen(yytext) - 1] == '_') { printf("Found a lexical error at the line %d and the column %d : identifier can't end with _",lineNumber,columnNumber); return 0;}
-              if (strstr(yytext,"__")) {printf("Found a lexical error at the line %d and the column %d : identifier can't have consecutive _",lineNumber,columnNumber); return 0;}
-              printf("%s",yytext);
-              yylval.str=strdup(yytext);
-              inserer(yytext,"idf");
-              return identifier;
-              }
+"MainPrgm" { 
+    columnNumber += yyleng; 
+    return MainPrgm; 
+}
 
-{singleLineComment} {printf("one line comment\n"); columnNumber+=yyleng; return singleLineComment;}
-{multiLineComment} {printf("multi-line comment\n"); 
-                    int i = 0;
-                    while (yytext[i] != '\0') {
-                       if (yytext[i] == '\n') {
-                          lineNumber += 1;
-                          columnNumber = 1;
-                       }else{
-                          columnNumber += 1;
-                       }
-                       i += 1;   
-                    }
-                    return multiLineComment;
-                    }
+"Var" { 
+    columnNumber += yyleng; 
+    return Var; 
+}
 
-{chaine} {printf("%s ",yytext); columnNumber+=yyleng;}
+"BeginPg" { 
+    columnNumber += yyleng; 
+    return BeginPg; 
+}
+
+"EndPg" { 
+    columnNumber += yyleng; 
+    return EndPg; 
+}
+
+"let" { 
+    columnNumber += yyleng; 
+    return let; 
+}
+
+"@define" { 
+    columnNumber += yyleng; 
+    return define; 
+}
+
+"Const" { 
+    columnNumber += yyleng; 
+    return Const; 
+}
+
+"Int" { 
+    columnNumber += yyleng; 
+    return Int; 
+}
+
+"Float" { 
+    columnNumber += yyleng; 
+    return Float; 
+}
+
+"if" { 
+    columnNumber += yyleng; 
+    return IF; 
+}
+
+"then" { 
+    columnNumber += yyleng; 
+    return THEN; 
+}
+
+"else" { 
+    columnNumber += yyleng; 
+    return ELSE; 
+}
+
+"do" { 
+    columnNumber += yyleng; 
+    return DO; 
+}
+
+"while" { 
+    columnNumber += yyleng; 
+    return WHILE; 
+}
+
+"for" { 
+    columnNumber += yyleng; 
+    return FOR; 
+}
+
+"from" { 
+    columnNumber += yyleng; 
+    return FROM; 
+}
+
+"to" { 
+    columnNumber += yyleng; 
+    return TO; 
+}
+
+"step" { 
+    columnNumber += yyleng; 
+    return STEP; 
+}
+
+"input" { 
+    columnNumber += yyleng; 
+    return INPUT; 
+}
+
+"output" { 
+    columnNumber += yyleng; 
+    return OUTPUT; 
+}
+
+"AND" { 
+    columnNumber += yyleng; 
+    return AND; 
+}
+
+"OR" { 
+    columnNumber += yyleng; 
+    return OR; 
+}
+
+{Identifier} {
+    columnNumber += yyleng;
+
+    if (yyleng > 14) {
+        printf("Found a lexical error at line %d, column %d: identifier is too long\n", lineNumber, columnNumber);
+        return 0;
+    }
+
+    if (yytext[strlen(yytext) - 1] == '_') {
+        printf("Found a lexical error at line %d, column %d: identifier can't end with '_'\n", lineNumber, columnNumber);
+        return 0;
+    }
+
+    if (strstr(yytext, "__")) {
+        printf("Found a lexical error at line %d, column %d: identifier can't have consecutive '_'\n", lineNumber, columnNumber);
+        return 0;
+    }
+
+    printf("Identifier found: %s\n", yytext);
+    int i;
+    for (i = 0; i < 12; i++) {
+        if (strcmp(yytext, keywords[i]) == 0) {
+            yylval.str = strdup(yytext);
+            inserer(yytext, "keyword", "keyword", (Value){.entier = 0}); 
+            return identifier;
+        }
+    }
+    char* endptr;
+    int intValue = strtol(yytext, &endptr, 10);
+    if (*endptr == '\0') {  
+        yylval.entier = intValue;
+        inserer(yytext, "variable", "int", (Value){.entier = intValue});  
+        return identifier;
+    }
+
+    float floatValue = strtof(yytext, &endptr);
+    if (*endptr == '\0') {  
+        yylval.floatval = floatValue;
+        inserer(yytext, "variable", "float", (Value){.floatval = floatValue});  
+        return identifier;
+    }
+
+}
+
+{singleLineComment} { 
+    columnNumber += yyleng; 
+}
+
+{multiLineComment} {
+    int i = 0;
+    while (yytext[i] != '\0') {
+        if (yytext[i] == '\n') {
+            lineNumber++;
+            columnNumber = 1;
+        } else {
+            columnNumber++;
+        }
+        i++;
+    }
+}
+
+{chaine} {printf("%s ",yytext); columnNumber+=yyleng; return STRING;}
 {signedInteger} {columnNumber+=yyleng;
                  int numValue = atoi(yytext);
                  if(numValue > 32767 || numValue <-32768){printf("Found a lexical error at the line %d and the column %d : signed integer value can't be above 32767 or under -32768\n",lineNumber,columnNumber); return 0;}
                  printf("%s",yytext); 
+                 return signed_int;
                  }
 {integer} {columnNumber+=yyleng;
            int numValue = atoi(yytext);
@@ -79,29 +204,131 @@ signedFloat [+-][0-9]+\.[0-9]+
            yylval.entier=atoi(yytext);
            return t_int;
            }
-{signedFloat} {printf("%s ",yytext); columnNumber+=yyleng;}
+{signedFloat} {printf("%s ",yytext); columnNumber+=yyleng; return signed_float;}
 {float} {printf("%s ",yytext); yylval.floatval=atof(yytext); columnNumber+=yyleng; return t_float;}
-\, {printf(","); columnNumber+=1; return vg;}
-\; {printf(";\n"); columnNumber+=1; return pvg;}
-\= {printf(" = "); columnNumber+=1; return egual;}
-":=" {printf(" aff "); columnNumber+=2;}
-\: {printf(" : "); columnNumber+=1; return tp;}
-\+ {printf(" add "); columnNumber+=1;}
-\- {printf(" substract "); columnNumber+=1;}
-\/ {printf(" divide "); columnNumber+=1;}
-\* {printf(" multiply "); columnNumber+=1;}
-\( {printf("("); columnNumber+=1;}
-\) {printf(")"); columnNumber+=1;}
-\{ {printf("{\n"); columnNumber+=1; return ocb;}
-\} {printf("}\n"); columnNumber+=1; return ccb;}
-\[ {printf("["); columnNumber+=1; return ob;}
-\] {printf("]"); columnNumber+=1; return cb;}
-\< {printf("<\n"); columnNumber+=1;}
-\> {printf(">\n"); columnNumber+=1;}
-\! {printf("!\n"); columnNumber+=1;}
-[ ] columnNumber+=1;
-"\t" columnNumber+=4;
-\n {lineNumber+=1; columnNumber = 1;}
-. {printf("Found a lexical error at the line %d and the column %d \n",lineNumber,columnNumber); columnNumber+=yyleng;}
-%%
 
+\, { 
+    columnNumber++; 
+    return vg; 
+}
+
+\; { 
+    columnNumber++; 
+    return pvg; 
+}
+
+\= { 
+    columnNumber++; 
+    return egual; 
+}
+
+":=" { 
+    columnNumber += 2; 
+    return aff; 
+}
+
+"==" { 
+    columnNumber += 2; 
+    return eq; 
+}
+
+"<=" { 
+    columnNumber += 2; 
+    return le; 
+}
+
+">=" { 
+    columnNumber += 2; 
+    return ge; 
+}
+
+"!=" { 
+    columnNumber += 2; 
+    return ne; 
+}
+
+\: { 
+    columnNumber++; 
+    return tp; 
+}
+
+\+ { 
+    columnNumber++; 
+    return add; 
+}
+
+\- { 
+    columnNumber++; 
+    return sub; 
+}
+
+\/ { 
+    columnNumber++; 
+    return divide; 
+}
+
+\* { 
+    columnNumber++; 
+    return mult; 
+}
+
+\( { 
+    columnNumber++; 
+    return op; 
+}
+
+\) { 
+    columnNumber++; 
+    return cp; 
+}
+
+\{ { 
+    columnNumber++; 
+    return ocb; 
+}
+
+\} { 
+    columnNumber++; 
+    return ccb; 
+}
+
+\[ { 
+    columnNumber++; 
+    return ob; 
+}
+
+\] { 
+    columnNumber++; 
+    return cb; 
+}
+
+\< { 
+    columnNumber++; 
+    return lt; 
+}
+
+\> { 
+    columnNumber++; 
+    return gt; 
+}
+
+\! { 
+    columnNumber++; 
+    return NOT; 
+}
+
+[ ] columnNumber++; 
+
+"\t" columnNumber += 4;
+
+\n { 
+    lineNumber++; 
+    columnNumber = 1; 
+}
+
+. { 
+    printf("Lexical error at line %d, column %d: unrecognized symbol '%s'\n", lineNumber, columnNumber, yytext); 
+    columnNumber += yyleng; 
+}
+
+%%
