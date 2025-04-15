@@ -1,334 +1,386 @@
 %{
-   #include "TS.h" 
-   #include "syntax.tab.h"
+   #include "SymbolsTable.h" 
+   #include "Syntax.tab.h"
    #include <stdio.h> 
    #include <stdlib.h>
    #include <string.h>
-   extern int lineNumber;
-   extern int columnNumber;
+   extern int line_Number;
+   extern int column_Number;
    extern YYSTYPE yylval;
 %}
 
-Identifier [a-zA-Z]([a-zA-Z0-9]*_?[a-zA-Z0-9])* 
-singleLineComment "< !-"[^\n]*"- !>"
-multiLineComment "\{--"(.|\n)*?"--\}"
-chaine \"[^\"]*\" 
+Identifier [a-zA-Z0-9_]+ 
+single_line_comment "< !-"[^\n]*"- !>"
+multi_line_comment "\{--"(.|\n)*?"--\}"
+message \"[^\"]*\"
 integer [0-9]+
-signedInteger [+-][0-9]+
+signed_integer [+-][0-9]+
 float [0-9]+\.[0-9]+
-signedFloat [+-][0-9]+\.[0-9]+
+signed_float [+-][0-9]+\.[0-9]+
 
 %%
 "MainPrgm" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("MainPrgm", "keyword");
     return MainPrgm; 
 }
 
 "Var" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("Var", "keyword");
     return Var; 
 }
 
 "BeginPg" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("BeginPg", "keyword");
     return BeginPg; 
 }
 
 "EndPg" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("EndPg", "keyword");
     return EndPg; 
 }
 
 "let" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("let", "keyword");
     return let; 
 }
 
 "@define" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("@define", "keyword");
     return define; 
 }
 
 "Const" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+     insert_into_keyword_table("Const", "keyword");
     return Const; 
 }
 
 "Int" { 
-    columnNumber += yyleng; 
-    return Int; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("Int", "keyword");
+    yylval.str = strdup("int");
+    return Int_keyword; 
 }
 
 "Float" { 
-    columnNumber += yyleng; 
-    return Float; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("Float", "keyword");
+     yylval.str = strdup("float");
+    return Float_keyword; 
 }
 
 "if" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("if", "keyword");
     return IF; 
 }
 
 "then" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("then", "keyword");
     return THEN; 
 }
 
 "else" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("else", "keyword");
     return ELSE; 
 }
 
 "do" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("do", "keyword");
     return DO; 
 }
 
 "while" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("while", "keyword");
     return WHILE; 
 }
 
 "for" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("for", "keyword");
     return FOR; 
 }
 
 "from" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("from", "keyword");
     return FROM; 
 }
 
 "to" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("to", "keyword");
     return TO; 
 }
 
 "step" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("step", "keyword");
     return STEP; 
 }
 
 "input" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng; 
+    insert_into_keyword_table("input", "keyword");
     return INPUT; 
 }
 
 "output" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng;
+    insert_into_keyword_table("output", "keyword"); 
     return OUTPUT; 
 }
 
 "AND" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng;
+    insert_into_keyword_table("AND", "keyword"); 
     return AND; 
 }
 
 "OR" { 
-    columnNumber += yyleng; 
+    column_Number += yyleng;
+    insert_into_keyword_table("OR", "keyword"); 
     return OR; 
 }
 
+{signed_integer} {
+                 int numValue = atoi(yytext);
+                 if(numValue > 32767 || numValue <-32768){printf("Found a lexical error at the line %d and the column %d : signed integer value can't be above 32767 or under -32768\n",line_Number,column_Number); return 0;}
+                 printf("%s",yytext); 
+                 column_Number+=yyleng;
+                 yylval.str = strdup(yytext);
+                 return signed_integer_value;
+                 }
+{integer} {
+           int numValue = atoi(yytext);
+           if(numValue > 32767){printf("Found a lexical error at the line %d and the column %d : integer value can't be above 32767\n",line_Number,column_Number); return 0;}
+           printf("%s",yytext);
+           column_Number+=yyleng; 
+           yylval.str = strdup(yytext);
+           return integer_value;
+           }
+{signed_float} {
+                printf("%s ",yytext); 
+                column_Number+=yyleng; 
+                yylval.str = strdup(yytext);
+                return signed_float_value;}
+{float} {
+        printf("%s ",yytext); 
+        yylval.str = strdup(yytext);
+        column_Number+=yyleng; 
+        return float_value;}
+
 {Identifier} {
-    columnNumber += yyleng;
 
+    // check if the length of the idf is correct
     if (yyleng > 14) {
-        printf("Found a lexical error at line %d, column %d: identifier is too long\n", lineNumber, columnNumber);
+        printf("Found a lexical error at line %d, column %d: identifier is too long\n", line_Number, column_Number);
         return 0;
     }
-
+    // check if the idf doesn't end with _
     if (yytext[strlen(yytext) - 1] == '_') {
-        printf("Found a lexical error at line %d, column %d: identifier can't end with '_'\n", lineNumber, columnNumber);
+        printf("Found a lexical error at line %d, column %d: identifier can't end with _\n", line_Number, column_Number);
         return 0;
     }
-
+    // check if the idf doesn't contain __
     if (strstr(yytext, "__")) {
-        printf("Found a lexical error at line %d, column %d: identifier can't have consecutive '_'\n", lineNumber, columnNumber);
+        printf("Found a lexical error at line %d, column %d: identifier can't have consecutive _\n", line_Number, column_Number);
         return 0;
     }
-
-    printf("Identifier found: %s\n", yytext);
+    // check if the idf doesn't start with a letter
+    if ( !((yytext[0] >= 'a' && yytext[0] <= 'z') || (yytext[0] >= 'A' && yytext[0] <= 'Z')) )
+    {
+        printf("Found a lexical error at line %d, column %d: identifier must start with a letter\n", line_Number, column_Number);
+        return 0;
+    }
+    // check if the idf contains capital letters other then the first letter
     int i;
-    for (i = 0; i < 12; i++) {
-        if (strcmp(yytext, keywords[i]) == 0) {
-            yylval.str = strdup(yytext);
-            inserer(yytext, "keyword", "keyword", (Value){.entier = 0}); 
-            return identifier;
-        }
+    for (i = 1; yytext[i] != '\0'; i++) {
+    if (yytext[i] >= 'A' && yytext[i] <= 'Z') {
+        printf("Found a lexical error at line %d, column %d: identifier must not contain uppercase letters after the first character\n", line_Number, column_Number + i);
+        return 0;
     }
-    char* endptr;
-    int intValue = strtol(yytext, &endptr, 10);
-    if (*endptr == '\0') {  
-        yylval.entier = intValue;
-        inserer(yytext, "variable", "int", (Value){.entier = intValue});  
-        return identifier;
     }
-
-    float floatValue = strtof(yytext, &endptr);
-    if (*endptr == '\0') {  
-        yylval.floatval = floatValue;
-        inserer(yytext, "variable", "float", (Value){.floatval = floatValue});  
-        return identifier;
-    }
+    column_Number += yyleng;
+    printf("Identifier found: %s\n", yytext);
+    yylval.str = strdup(yytext);
+    return identifier;
 
 }
 
-{singleLineComment} { 
-    columnNumber += yyleng; 
+{single_line_comment} { 
+    column_Number += yyleng; 
 }
 
-{multiLineComment} {
+{multi_line_comment} {
     int i = 0;
     while (yytext[i] != '\0') {
         if (yytext[i] == '\n') {
-            lineNumber++;
-            columnNumber = 1;
+            line_Number++;
+            column_Number = 1;
         } else {
-            columnNumber++;
+            column_Number++;
         }
         i++;
     }
 }
 
-{chaine} {printf("%s ",yytext); columnNumber+=yyleng; return STRING;}
-{signedInteger} {columnNumber+=yyleng;
-                 int numValue = atoi(yytext);
-                 if(numValue > 32767 || numValue <-32768){printf("Found a lexical error at the line %d and the column %d : signed integer value can't be above 32767 or under -32768\n",lineNumber,columnNumber); return 0;}
-                 printf("%s",yytext); 
-                 return signed_int;
-                 }
-{integer} {columnNumber+=yyleng;
-           int numValue = atoi(yytext);
-           if(numValue > 32767){printf("Found a lexical error at the line %d and the column %d : integer value can't be above 32767\n",lineNumber,columnNumber); return 0;}
-           printf("%s",yytext); 
-           yylval.entier=atoi(yytext);
-           return t_int;
-           }
-{signedFloat} {printf("%s ",yytext); columnNumber+=yyleng; return signed_float;}
-{float} {printf("%s ",yytext); yylval.floatval=atof(yytext); columnNumber+=yyleng; return t_float;}
+{message} {printf("%s ",yytext); column_Number+=yyleng; return STRING;}
 
 \, { 
-    columnNumber++; 
-    return vg; 
+    column_Number++; 
+    insert_into_seperator_table(",","seperator");
+    return COMMA; 
 }
 
 \; { 
-    columnNumber++; 
-    return pvg; 
+    column_Number++; 
+    insert_into_seperator_table(";","seperator");
+    return SEMI_COLON; 
 }
 
-\= { 
-    columnNumber++; 
-    return egual; 
+"=" { 
+    column_Number += 2; 
+    insert_into_seperator_table(":=","seperator");
+    return EQUAL; 
 }
 
 ":=" { 
-    columnNumber += 2; 
-    return aff; 
+    column_Number += 2; 
+    insert_into_seperator_table(":=","seperator");
+    return AFFECTATION; 
 }
 
 "==" { 
-    columnNumber += 2; 
-    return eq; 
+    column_Number += 2; 
+    insert_into_seperator_table("==","seperator");
+    return EQUAL_TO; 
 }
 
 "<=" { 
-    columnNumber += 2; 
-    return le; 
+    column_Number += 2; 
+    insert_into_seperator_table("<=","seperator");
+    return LESS_OR_EQUAL; 
 }
 
 ">=" { 
-    columnNumber += 2; 
-    return ge; 
+    column_Number += 2; 
+    insert_into_seperator_table(">=","seperator");
+    return GREATER_OR_EQUAL; 
 }
 
 "!=" { 
-    columnNumber += 2; 
-    return ne; 
+    column_Number += 2; 
+    insert_into_seperator_table("!=","seperator");
+    return NOT_EQUAL; 
 }
 
 \: { 
-    columnNumber++; 
-    return tp; 
+    column_Number++;
+    insert_into_seperator_table(":","seperator"); 
+    return COLON; 
 }
 
 \+ { 
-    columnNumber++; 
-    return add; 
+    column_Number++;
+    insert_into_seperator_table("+","seperator"); 
+    return ADDITION; 
 }
 
 \- { 
-    columnNumber++; 
-    return sub; 
+    column_Number++;
+    insert_into_seperator_table("-","seperator"); 
+    return SUBSTRACTION; 
 }
 
 \/ { 
-    columnNumber++; 
-    return divide; 
+    column_Number++;
+    insert_into_seperator_table("/","seperator"); 
+    return DIVISION; 
 }
 
 \* { 
-    columnNumber++; 
-    return mult; 
+    column_Number++;
+    insert_into_seperator_table("*","seperator"); 
+    return MULTIPLICATION; 
 }
 
 \( { 
-    columnNumber++; 
-    return op; 
+    column_Number++;
+    insert_into_seperator_table("(","seperator"); 
+    return OPEN_PARENTHESIS; 
 }
 
 \) { 
-    columnNumber++; 
-    return cp; 
+    column_Number++;
+    insert_into_seperator_table(")","seperator"); 
+    return CLOSE_PARENTHESIS; 
 }
 
 \{ { 
-    columnNumber++; 
-    return ocb; 
+    column_Number++;
+    insert_into_seperator_table("{","seperator"); 
+    return OPEN_CURLY_BRACE; 
 }
 
 \} { 
-    columnNumber++; 
-    return ccb; 
+    column_Number++;
+    insert_into_seperator_table("}","seperator"); 
+    return CLOSE_CURLY_BRACE; 
 }
 
 \[ { 
-    columnNumber++; 
-    return ob; 
+    column_Number++;
+    insert_into_seperator_table("[","seperator"); 
+    return OPEN_SQUARE_BRACKET; 
 }
 
 \] { 
-    columnNumber++; 
-    return cb; 
+    column_Number++;
+    insert_into_seperator_table("]","seperator"); 
+    return CLOSE_SQUARE_BRACKET; 
 }
 
 \< { 
-    columnNumber++; 
-    return lt; 
+    column_Number++;
+    insert_into_seperator_table("<","seperator"); 
+    return LESS_THAN; 
 }
 
 \> { 
-    columnNumber++; 
-    return gt; 
+    column_Number++;
+    insert_into_seperator_table(">","seperator"); 
+    return GREATER_THAN; 
 }
 
 \! { 
-    columnNumber++; 
+    column_Number++;
+    insert_into_seperator_table("!","seperator"); 
     return NOT; 
 }
 
-[ ] columnNumber++; 
+[ ] column_Number++; 
 
-"\t" columnNumber += 4;
+"\t" column_Number += 4;
 
 \n { 
-    lineNumber++; 
-    columnNumber = 1; 
+    line_Number++; 
+    column_Number = 1; 
 }
 
 . { 
-    printf("Lexical error at line %d, column %d: unrecognized symbol '%s'\n", lineNumber, columnNumber, yytext); 
-    columnNumber += yyleng; 
+    printf("Lexical error at line %d, column %d: unrecognized symbol '%s'\n", line_Number, column_Number, yytext); 
+    column_Number += yyleng; 
 }
 
 %%

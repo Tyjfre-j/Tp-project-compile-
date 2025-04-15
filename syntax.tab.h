@@ -40,55 +40,55 @@
       know about them.  */
    enum yytokentype {
      MainPrgm = 258,
-     pvg = 259,
-     Var = 260,
-     let = 261,
-     define = 262,
-     Const = 263,
-     t_int = 264,
-     t_float = 265,
-     BeginPg = 266,
-     ocb = 267,
-     ccb = 268,
-     EndPg = 269,
-     egual = 270,
-     tp = 271,
-     vg = 272,
-     ob = 273,
-     cb = 274,
-     signed_int = 275,
-     signed_float = 276,
-     op = 277,
-     cp = 278,
-     aff = 279,
-     add = 280,
-     sub = 281,
-     divide = 282,
-     mult = 283,
-     IF = 284,
-     THEN = 285,
-     ELSE = 286,
-     DO = 287,
-     WHILE = 288,
-     FOR = 289,
-     FROM = 290,
-     TO = 291,
-     STEP = 292,
-     lt = 293,
-     gt = 294,
-     NOT = 295,
-     AND = 296,
-     OR = 297,
-     eq = 298,
-     ge = 299,
-     le = 300,
-     ne = 301,
-     INPUT = 302,
-     OUTPUT = 303,
-     STRING = 304,
-     identifier = 305,
-     Int = 306,
-     Float = 307
+     Var = 259,
+     BeginPg = 260,
+     EndPg = 261,
+     let = 262,
+     define = 263,
+     Const = 264,
+     IF = 265,
+     THEN = 266,
+     ELSE = 267,
+     DO = 268,
+     WHILE = 269,
+     FOR = 270,
+     FROM = 271,
+     TO = 272,
+     STEP = 273,
+     INPUT = 274,
+     OUTPUT = 275,
+     AND = 276,
+     OR = 277,
+     COMMA = 278,
+     SEMI_COLON = 279,
+     AFFECTATION = 280,
+     EQUAL = 281,
+     EQUAL_TO = 282,
+     LESS_OR_EQUAL = 283,
+     GREATER_OR_EQUAL = 284,
+     NOT_EQUAL = 285,
+     COLON = 286,
+     ADDITION = 287,
+     SUBSTRACTION = 288,
+     DIVISION = 289,
+     MULTIPLICATION = 290,
+     OPEN_PARENTHESIS = 291,
+     CLOSE_PARENTHESIS = 292,
+     OPEN_CURLY_BRACE = 293,
+     CLOSE_CURLY_BRACE = 294,
+     OPEN_SQUARE_BRACKET = 295,
+     CLOSE_SQUARE_BRACKET = 296,
+     LESS_THAN = 297,
+     GREATER_THAN = 298,
+     NOT = 299,
+     identifier = 300,
+     STRING = 301,
+     Int_keyword = 302,
+     Float_keyword = 303,
+     integer_value = 304,
+     signed_integer_value = 305,
+     float_value = 306,
+     signed_float_value = 307
    };
 #endif
 
@@ -99,16 +99,20 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 12 "syntax.y"
+#line 12 "Syntax.y"
 
-int entier;
+int integer_value;
 char* str;
-float floatval;
+float float_value;
+struct {
+        char** list;
+        int number_of_elements;
+}idf_list;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 112 "syntax.tab.h"
+#line 116 "Syntax.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
